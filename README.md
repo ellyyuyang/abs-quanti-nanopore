@@ -18,7 +18,7 @@ This repo contains the commands to reproduce the absolute quantification results
 
 
 ## Components for reproducible analysis
-#### 1. Construction of the `Kraken2-compatible GTDB_r95` index database files
+#### 1. Construction of the `Kraken2-compatible GTDB-r95` index database files
 ***Note:*** <br>
 ***Different versions of the GTDB database can be used following the same logic below.*** <br>
 ***Pay attention to the absolute location of the files used under your local device. Modifications to the absolute file paths may apply.***
@@ -119,6 +119,7 @@ python merge_metaphlan_tables.py metadata_taxid_taxarank_avggsize.txt taxid_taxr
 #### 3. End-to-End `Absolute Quantification` workflow
 **The following workflow can be realized using the script I have provided: *abs-quanti-nanopore.sh*** <br>
 ***Note: Pay attention to the absolute location of the files used under your local device. Modifications to the absolute file paths are expected for local usage.***
+
 * Tools used: <br>
   * [seqtk](https://github.com/lh3/seqtk) <br>
   * [seqkit](https://github.com/shenwei356/seqkit) <br>
@@ -127,10 +128,10 @@ python merge_metaphlan_tables.py metadata_taxid_taxarank_avggsize.txt taxid_taxr
   * [Minimap2](https://github.com/lh3/minimap2) <br>
   * [filter_fasta_by_list_of_headers.py](https://bioinformatics.stackexchange.com/a/3940) <br>
 * Additional files used (*file path will have to be modified in the script ***abs-quanti-nanopore.sh*** for local runs*): <br>
-  * **Kraken2_gtdb_db**: *your Kraken2-compatible GTDB index database files* <br>
+  * **Kraken2_gtdb_db**: `*your Kraken2-compatible GTDB index database files*` <br>
   * ***mClover3* fasta file**: `/fasta/mClover3.fa` <br>
-  * [**nucleotide ARG database**](https://github.com/xiaole99/ARGs-OAP-v2.0-development) and the structure file: nucleotide-ARG-DB.fasta <br>
-  * **Structure Avg Genome Size (AGS) database**: *GTDB_r95_AGS_DB* file constructed [above](#2-construction-of-the-structured-average-genome-size-sags-database) <br>
+  * [**nucleotide ARG database**](https://github.com/xiaole99/ARGs-OAP-v2.0-development) and the structure file: `nucleotide-ARG-DB.fasta` <br>
+  * **Structure Avg Genome Size (AGS) database**: `*GTDB_r95_AGS_DB*` file constructed [above](#2-construction-of-the-structured-average-genome-size-sags-database) <br>
   * **Nanopore DNA CS fasta file**:  `/fasta/DCS.fasta` <br>
   * **Pathogen list** converted to GTDB taxonomy nomenclature: `/files/foresight_gtdb_1307`, for [original list](https://webarchive.nationalarchives.gov.uk/ukgwa/20121212135622/http://www.bis.gov.uk/assets/bispartners/foresight/docs/infectious-diseases/t16.pdf) 
 * Prepare sequencing reads
@@ -167,6 +168,16 @@ python merge_metaphlan_tables.py metadata_taxid_taxarank_avggsize.txt taxid_taxr
 
 * Compile a final mothertable containing the following information for each read: <br>
 **taxID|number of reads|sum of bases|AGS|cell number seq'd|ARG annotation|ARG counts|ARG annotation|potential pathogen by pathogen list|kraken2 LCA classification|lineage of the taxonomy classification**
+
+* **Running time estimation for major steps** <br>
+	For an input fastq file with size `10 Gb`, an aprroximated `3-4 hr` data processing time would be expected to generate the final microbial absolute quantification results.
+	* `Kraken2` for taxonomic classification -- `30 min` with 10 threads and 300 G memory pre-allocated.
+	* `Minimap2` for *mClover3* (spiked gene) identification -- `2.5 min` with 10 threads and 150 G memory pre-allocated.
+	* `Processing kraken2 output` to convert the sequenced genome copy numbers to the final absolute cell abundance per unit sample volumn: 
+		* Summing bases for all the classified reads to different Kraken2-assigned LCA taxonomic lineages -- `2.5 hr` with 10 threads and 150 G memory pre-allocated.
+		* Stratifying the summation results above into different taxonomic levels -- `5 min` with 10 threads and 150 G memory pre-allocated.
+		* Convert the sequenced genome copy numbers into the asbolute cell abundance per unit sample volumn -- untimed, but approx. `15 min` with single thread.
+		
 
 ## If you intend to use these commands, please cite these resources:
 [GTDB](https://gtdb.ecogenomic.org/) <br>
