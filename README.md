@@ -127,10 +127,10 @@ python merge_metaphlan_tables.py metadata_taxid_taxarank_avggsize.txt taxid_taxr
   * In case of Illumina metagenomic shotgun reads, [Braken2](https://github.com/jenniferlu717/Bracken) <br>
   * [Minimap2](https://github.com/lh3/minimap2) <br>
   * [filter_fasta_by_list_of_headers.py](https://bioinformatics.stackexchange.com/a/3940) <br>
-* Additional files used (*file path will have to be modified in the script ***abs-quanti-nanopore.sh*** for local runs*): <br>
+* Additional files used (*file path will have to be modified in the script ***abs-quanti-nanopore.sh*** for local runs*, files bracketed by * should be provided by users): <br>
   * **Kraken2_gtdb_db**: `*your Kraken2-compatible GTDB index database files*` <br>
   * ***mClover3* fasta file**: `/fasta/mClover3.fa` <br>
-  * [**nucleotide ARG database**](https://github.com/xiaole99/ARGs-OAP-v2.0-development) and the structure file: `nucleotide-ARG-DB.fasta` <br>
+  * [**nucleotide ARG database**](https://github.com/xiaole99/ARGs-OAP-v2.0-development) and the structure file: `*nucleotide-ARG-DB.fasta*` <br>
   * **Structure Avg Genome Size (AGS) database**: `*GTDB_r95_AGS_DB*` file constructed [above](#2-construction-of-the-structured-average-genome-size-sags-database) <br>
   * **Nanopore DNA CS fasta file**:  `/fasta/DCS.fasta` <br>
   * **Pathogen list** converted to GTDB taxonomy nomenclature: `/files/foresight_gtdb_1307`, for [original list](https://webarchive.nationalarchives.gov.uk/ukgwa/20121212135622/http://www.bis.gov.uk/assets/bispartners/foresight/docs/infectious-diseases/t16.pdf) 
