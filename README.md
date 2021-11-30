@@ -170,7 +170,7 @@ python merge_metaphlan_tables.py metadata_taxid_taxarank_avggsize.txt taxid_taxr
 **taxID|number of reads|sum of bases|AGS|cell number seq'd|ARG annotation|ARG counts|ARG annotation|potential pathogen by pathogen list|kraken2 LCA classification|lineage of the taxonomy classification**
 
 * **Running time estimation for major steps** <br>
-	For an input fastq file with size `10 Gb`, an aprroximated `3-4 hr` data processing time would be expected to generate the final microbial absolute quantification results.
+	For an input fastq file with size `10 Gb`, an approximated `3-4 hr` data processing time would be expected to generate the final microbial absolute quantification results.
 	* `Kraken2` for taxonomic classification -- `30 min` with 10 threads and 300 G memory pre-allocated.
 	* `Minimap2` for *mClover3* (spiked gene) identification -- `2.5 min` with 10 threads and 150 G memory pre-allocated.
 	* `Processing kraken2 output` to convert the sequenced genome copy numbers to the final absolute cell abundance per unit sample volumn: 
