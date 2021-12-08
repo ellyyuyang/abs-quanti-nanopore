@@ -172,7 +172,7 @@ $1 = int, concentration of spike culture, eg. "3490000" in CFU/uL
 $2 = int, volumn of the spike culture dosed, eg. "100" in uL
 $3 = int, volumn of the sample to which the spike culture is added, eg. "50" in mL
 
-for file in *.fastq.fasta
+for file in input_1kb.fa
 do num_of_mClover3_seqd=$(awk -F"\t" '{sum+=$2} END {print sum/720}' table2);
         scaling_factor=$(awk -v mClover3=$num_of_mClover3_seqd -v conc=${1} -v vol=${2}  'BEGIN {print conc*vol/mClover3}' );
 	awk -F"\t" -v factor=$scaling_factor -v s_vol=${3} '{print (($5*factor)/s_vol)}' table1 |paste table1 - |awk -F"\t" '{print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"($7*1000)"\t"$6}' >table1_actualcellnumberperLsample;
