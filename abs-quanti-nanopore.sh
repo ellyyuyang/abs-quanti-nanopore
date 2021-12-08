@@ -15,7 +15,7 @@
 #	f. compile a table with the following information:
 #	readID|read length|read generation time (sec) (table1)
 
-# 2. Kraken2 using the mClover-included GTDB r95 database
+# 2. Kraken2 for taxonomic classification using GTDB r95 database
 #	a. compile a table with the following information:
 #	taxID|sumofbases|AGS|lineage of the assigned taxID|cellnumber (table2)
 
@@ -80,7 +80,7 @@ do seqtk seq -a ${file} > ${file}.fasta;
 	unset start_sec;
 	#filter out sequences shorter than 1kb
 	seqkit seq -m 1000 ${file}.fasta > ${file}.fasta_1kb_withDCS.fa;
-	#filter out DCS reads by blastn with min 85% similarity, min 90% subLcounts, and max 3600bp length (with this cutoff the final % DCS bases is around 1% witch is the dosage percentage, 10ng in 1ug)
+	#filter out DCS reads by minimap2 with min 85% similarity, min 90% subLcounts, and max 3600bp length (with this cutoff the final % DCS bases is around 1% witch is the dosage percentage, 10ng in 1ug)
 	minimap2 -cx map-ont ./fasta/DCS.fasta ${file}.fasta_1kb_withDCS.fa > ${file}.fasta_1kb_withDCS_minimapDCS.paf; #path to the DCS fasta file can be modified
 	awk '{print 100*($10/$11)}'  ${file}.fasta_1kb_withDCS_minimapDCS.paf|paste ${file}.fasta_1kb_withDCS_minimapDCS.paf - >${file}.fasta_1kb_withDCS_minimapDCS_similarity.paf;
 	awk '{print 100*(sqrt(($9-$8)*($9-$8))/$7)}'  ${file}.fasta_1kb_withDCS_minimapDCS.paf|paste ${file}.fasta_1kb_withDCS_minimapDCS_similarity.paf - > ${file}.fasta_1kb_withDCS_minimapDCS_similarity_subLpar.paf;
