@@ -1,7 +1,7 @@
 # abs-quanti-nanopore
 This repo contains the commands to reproduce the absolute quantification results in the paper "Rapid Absolute Quantification of Pathogens and ARGs by Nanopore Sequencing" by Yang, Yu et al. 2021. <br>
-* This paper is published [here]()
-* Raw sequencing data files are available under [BioProject: PRJNA728386](https://dataview.ncbi.nlm.nih.gov/object/PRJNA728386?reviewer=1i2he035g4199njs0ttqtgmv4n)
+* This paper is published [here](https://www.sciencedirect.com/science/article/pii/S0048969721072661)
+* Raw sequencing data files are available under [BioProject: PRJNA728386](https://dataview.ncbi.nlm.nih.gov/object/PRJNA728386)
 * Intended use for research only
 ***
 ## Table of Contents
