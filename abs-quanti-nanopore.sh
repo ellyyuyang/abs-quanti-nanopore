@@ -2,7 +2,7 @@
 
 # This script is to process original passed (Q7) nanopore reads from mClover3-spiked samples. Taxonomy classification, ARG annotation, ARG-host classification, as well as potential pathogen identification. This script also subsample raw read file based on the read generation times to compare the community profiling, ARG profile, ARG host profiling, and potential pathogen profileing between different data sizes to the theoretical dataset (all data generated during the entire sequencing run). 
 
-# Written by YANG, Yu, last update on Nov 30 2021.
+# Written by YANG, Yu, last update on Dec 7 2021.
 
 # Workflow:
 # 1. Prepare sequencing reads: 
@@ -44,7 +44,7 @@
 # Kraken2_gtdb_db: *your Kraken2-compatible GTDB index database files*
 # mClover3 fasta file: /fasta/mClover3.fa 
 # nucleotide ARG database and the structure file (source: https://github.com/xiaole99/ARGs-OAP-v2.0-development): nucleotide-ARG-DB.fasta, ARG_structure
-# structure Avg Genome Size (AGS) database: GTDB_r95_AGS_DB file constructed 
+# Structure Average Genome Size (AGS) database: GTDB_r95_AGS_DB file constructed 
 # Nanopore DNA CS fasta file:  /fasta/DCS.fasta
 # filter_fasta_by_list_of_headers.py script (source: https://bioinformatics.stackexchange.com/a/3940)
 
@@ -54,7 +54,7 @@
 ##############################################
 #merge nanopore reads from the quality passed fastq folder
 cat fastq_pass/*gz > merged.fastq.gz
-#convert fq.gz file to fastq file
+#unzip fq.gz file
 gunzip merged.fastq.gz > merged.fastq
 for file in *.fastq
 	#convert fastq to fasta
@@ -87,7 +87,7 @@ do seqtk seq -a ${file} > ${file}.fasta;
 	scripts/filter_fasta_by_list_of_headers.py  ${file}.fasta_1kb_withDCS.fa ${file}.fasta_1kb_withDCS_minimapDCS_DCSseqID > ${file}.fasta_1kb.fa #path to the python script can be modified
 	
 	#taxonomy classification by kraken2 using GTDB supplemented with mClover genome
-	kraken2 --db database/kraken2_gtdb_r95_20200803_mcloveradded/fasta_by_list_of_headers.py ${file}.fasta_1kb.fa  --threads 15 --output ${file}.fasta_1kb_kraken2_gtdb_r95_new --use-names --report ${file}.fasta_1kb_kraken2_report_gtdbr95_new --unclassified-out ${file}.fasta_1kb_kraken2_gtdb_r95_new_unclassified --classified-out ${file}.fasta_1kb_kraken2_gtdb_r95_new_classified; #kraken database path can be replaced here
+	kraken2 --db database/kraken2_gtdb_r95_20200803_mcloveradded/ ${file}.fasta_1kb.fa  --threads 15 --output ${file}.fasta_1kb_kraken2_gtdb_r95_new --use-names --report ${file}.fasta_1kb_kraken2_report_gtdbr95_new --unclassified-out ${file}.fasta_1kb_kraken2_gtdb_r95_new_unclassified --classified-out ${file}.fasta_1kb_kraken2_gtdb_r95_new_classified; #kraken database path can be replaced here
 	seqkit fx2tab -l ${file}.fasta_1kb_kraken2_gtdb_r95_new_classified  |awk -F" " '{print $1"\t"$NF"\t"$(NF-2)}'|sed 's/kraken:taxid|//g'|awk -F"\t" '$3="tax_"$3 {print $1"\t"$2"\t"$3}'|sort -k1 > ${file}.fasta_1kb_kraken2_gtdb_r95_new_classified.seqid_length_taxid
 done
 
@@ -204,7 +204,7 @@ done
 for file in *.fastq.fasta_1kb_kraken2_gtdb_r95_new_classified.seqid_length_taxid_uniqtaxids_sumofbases_AGS_lineage_cellnumeber_table2_full_alltaxa_AGS_sumofbases_cellnumber_lineage
 do sed 's/\-/_/g' ${file}_actualcellnumberperLsample > ${file}_actualcellnumberperLsample_mod;
         sed 's/\-/_/g' /files/foresight_gtdb_1307 > GTDB_foresight_pathogens; #path to the pathogen list can be modified
-        grep -Fwf GTDB_foresight_pathogens ${file}_actualcellnumberperLsample_mod |sort -t$'\t' -k2> ${file}_actualcellnumberperLsample_mod_pathogens;
+        grep -Fwf GTDB_foresight_pathogens ${file}_actualcellnumberperLsample_mod |sort -t$'\t' -k2> ${file}_actualcellnumberperLsample_mod_pathogens; #path to the pathogen list can be modified
         join -t$'\t' -1 2 -2 1 -o 1.2 1.1 1.3 1.4 1.5 1.6 2.2 2.3 2.4 2.5 2.7 ${file}_actualcellnumberperLsample_mod_pathogens ARG-carrying_taxID_ARGnums_ARGIDs_ARGTypes_ARGsubtypes_taxon_lineage > ARG-carrying_taxID_ARGnums_ARGIDs_ARGTypes_ARGsubtypes_taxon_lineage_pathogens
 done
 
