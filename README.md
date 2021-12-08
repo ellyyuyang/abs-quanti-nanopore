@@ -9,50 +9,15 @@ This repo contains the commands to reproduce the absolute quantification results
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
-- [Construction of the Kraken2-compatible `GTDB_r95` Database](#1-construction-of-the-kraken2-compatible-gtdb-r95-index-database-files)
-- [Construction of the `Structured Average Genome Size (SAGS)` Database](#2-construction-of-the-structured-average-genome-size-sags-database)
-- [End-to-End `Absolute Quantification` workflow](#3-end-to-end-absolute-quantification-workflow)
+- [Construction of the `Structured Average Genome Size (SAGS)` Database](#1-construction-of-the-structured-average-genome-size-sags-database)
+- [End-to-End `Absolute Quantification` workflow](#2-end-to-end-absolute-quantification-workflow)
 - [Citations](#if-you-intend-to-use-these-commands-please-cite-these-resources)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 
 ## Components for reproducible analysis
-#### 1. Construction of the `Kraken2-compatible GTDB-r95` index database files
-***Note:*** <br>
-***Different versions of the GTDB database can be used following the same logic below.*** <br>
-***Pay attention to the absolute location of the files used under your local device. Modifications to the absolute file paths may apply.***
-* Tools used <br>
-  * [Metagenomics-Index-Correction: tax_from_gtdb.py](https://github.com/rrwick/Metagenomics-Index-Correction) <br>
-  * [Kraken2](https://github.com/DerrickWood/kraken2) <br>
-
-* Download the [GTDB database](https://data.gtdb.ecogenomic.org/releases/release95/95.0/)
-```
-wget https://data.gtdb.ecogenomic.org/releases/release95/95.0/auxillary_files/gtdbtk_r95_data.tar.gz
-```
-* Download the NCBI Taxonomy
-```
-kraken2-build  --download-taxonomy --db kraken2_gtdb_r95_20200803_mcloveradded
-```
-* Convert NCBI taxonomy to GTDB taxonomy
-```
-tax_from_gtdb.py \
-	 --gtdb release95/taxonomy/gtdb_taxonomy.tsv \
-	 --assemblies release95/fastani/database/ \
-	 --nodes taxonomy/nodes.dmp \
-	 --names taxonomy/names.dmp \
- --kraken_dir kraken2_gtdb_r95_20200803_mcloveradded/kraken2_ready_ref
-```
-* Add GTDB ref to library
-```
-for file in kraken2_gtdb_r95_20200803_mcloveradded/kraken2_ready_ref/*.fa
-do
-   kraken2-build --add-to-library $file --db kraken2_gtdb_r95_20200803_mcloveradded/
-done
-```
-* Follow the [official Kraken2 manual](https://github.com/DerrickWood/kraken2) for adding the complete genome of the spike-in into the Kraken2 database. *not neccessary*
-
-#### 2. Construction of the `Structured Average Genome Size (SAGS)` Database 
+#### 1. Construction of the `Structured Average Genome Size (SAGS)` Database 
 ***Note:*** <br>
 ***Different versions of the GTDB database can be used following the same logic below.*** <br>
 ***Pay attention to the absolute location of the files used under your local device. Modifications to the absolute file paths may apply.***
@@ -116,7 +81,7 @@ awk -F"\t" '{print $2"\t"$1}' taxid_taxarank_mod.txt >temp1; python merge_metaph
 python merge_metaphlan_tables.py metadata_taxid_taxarank_avggsize.txt taxid_taxrank_lineage|awk -F"\t" '$1="tax_"$1 {print $1"\t"$2"\t"$3"\t"$5}'|sed '1d' |sed '1i tax_1\tRoot\t2995590\tRoot' > GTDB_r95_AGS_DB
 ```
 
-#### 3. End-to-End `Absolute Quantification` workflow
+#### 2. End-to-End `Absolute Quantification` workflow
 
 **A) Tools used:** <br>
   * [seqtk](https://github.com/lh3/seqtk) <br>
@@ -172,7 +137,7 @@ $1 = int, concentration of spike culture, eg. "3490000" in CFU/uL
 $2 = int, volumn of the spike culture dosed, eg. "100" in uL
 $3 = int, volumn of the sample to which the spike culture is added, eg. "50" in mL
 
-for file in input_1kb.fa
+for file in *.fastq.fasta
 do num_of_mClover3_seqd=$(awk -F"\t" '{sum+=$2} END {print sum/720}' table2);
         scaling_factor=$(awk -v mClover3=$num_of_mClover3_seqd -v conc=${1} -v vol=${2}  'BEGIN {print conc*vol/mClover3}' );
 	awk -F"\t" -v factor=$scaling_factor -v s_vol=${3} '{print (($5*factor)/s_vol)}' table1 |paste table1 - |awk -F"\t" '{print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"($7*1000)"\t"$6}' >table1_actualcellnumberperLsample;
