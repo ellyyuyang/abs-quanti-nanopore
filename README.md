@@ -120,29 +120,33 @@ python merge_metaphlan_tables.py metadata_taxid_taxarank_avggsize.txt taxid_taxr
 **The following workflow can be realized using the script I have provided: *abs-quanti-nanopore.sh*** <br>
 ***Note: Pay attention to the absolute location of the files used under your local device. Modifications to the absolute file paths are expected for local usage.***
 
-*  Running the script as
-```
-./abs-quanti-nanopore.sh [$1] [$2] [$3]
-
-Parameters:
-	[$1]: concentration of the spike culture, eg. "3490000" in CFU/uL 
-	[$2]: volumn of the spike culture dosed, eg. "50" in uL
-	[$3]: volumn of sample used for spiking, eg. "500" in mL
-```
-* Tools used: <br>
+**A) Tools used:** <br>
   * [seqtk](https://github.com/lh3/seqtk) <br>
   * [seqkit](https://github.com/shenwei356/seqkit) <br>
   * [Kraken2](https://github.com/DerrickWood/kraken2) <br>
   * In case of Illumina metagenomic shotgun reads, [Braken2](https://github.com/jenniferlu717/Bracken) <br>
   * [Minimap2](https://github.com/lh3/minimap2) <br>
   * [filter_fasta_by_list_of_headers.py](https://bioinformatics.stackexchange.com/a/3940) <br>
-* Additional files used (*file path will have to be modified in the script ***abs-quanti-nanopore.sh*** for local runs, files bracketed by * should be provided by users*): <br>
+
+**B) Additional files used:** (*file path will have to be modified in the script ***abs-quanti-nanopore.sh*** for local runs, files bracketed by * should be provided by users*): <br>
   * **Kraken2_gtdb_db**: `*your Kraken2-compatible GTDB index database files*` <br>
   * ***mClover3* fasta file**: `/fasta/mClover3.fa` <br>
   * [**nucleotide ARG database and the structure file**](https://github.com/xiaole99/ARGs-OAP-v2.0-development): `*nucleotide-ARG-DB.fasta*` & `*ARG_structure*` <br>
   * **Structure Avg Genome Size (AGS) database**: `*GTDB_r95_AGS_DB*` file constructed [above](#2-construction-of-the-structured-average-genome-size-sags-database) <br>
   * **Nanopore DNA CS fasta file**:  `/fasta/DCS.fasta` <br>
-  * **Pathogen list** converted to GTDB taxonomy nomenclature: `/files/foresight_gtdb_1307`, (for [original list](https://webarchive.nationalarchives.gov.uk/ukgwa/20121212135622/http://www.bis.gov.uk/assets/bispartners/foresight/docs/infectious-diseases/t16.pdf))   *Please refer to the manuscript for details of the conversion to GTDB taxonomy nomenclature*
+  * **Pathogen list** converted to GTDB taxonomy nomenclature: `/files/foresight_gtdb_1307`, (for [original list](https://webarchive.nationalarchives.gov.uk/ukgwa/20121212135622/http://www.bis.gov.uk/assets/bispartners/foresight/docs/infectious-diseases/t16.pdf))   *Please refer to the manuscript for details of the conversion to GTDB taxonomy nomenclature* <br>
+
+**C) After modifing the locations of the additional files mentioned above in the script, run the script as:**
+```
+./abs-quanti-nanopore.sh $1 $2 $3
+
+Paramters
+ $1     int, Concentration of the spike culture, eg. "3490000" in CFU/uL 
+ $2     int, Volume of the spike culture dosed, eg. "50" in uL
+ $3     int, Volumn of the sample to which the above spiking condition is applied, eg. "500" in mL
+
+```
+**D) Logic flow in the script:**
 * Prepare sequencing reads
   * convert fastq to fasta; <br>
   * calculate read lengths for all reads; <br>
