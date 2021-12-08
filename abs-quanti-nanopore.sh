@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # This script is to process original passed (Q7) nanopore reads from mClover3-spiked samples. Taxonomy classification, ARG annotation, ARG-host classification, as well as potential pathogen identification. This script also subsample raw read file based on the read generation times to compare the community profiling, ARG profile, ARG host profiling, and potential pathogen profileing between different data sizes to the theoretical dataset (all data generated during the entire sequencing run). 
-
+# Details as https://github.com/ellyyuyang/abs-quanti-nanopore
+# Paper published at https://www.sciencedirect.com/science/article/pii/S0048969721072661
 # Written by YANG, Yu, last update on Dec 7 2021.
 
 # Workflow:
