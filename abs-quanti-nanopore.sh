@@ -81,11 +81,11 @@ do seqtk seq -a ${file} > ${file}.fasta;
 	#filter out sequences shorter than 1kb
 	seqkit seq -m 1000 ${file}.fasta > ${file}.fasta_1kb_withDCS.fa;
 	#filter out DCS reads by blastn with min 85% similarity, min 90% subLcounts, and max 3600bp length (with this cutoff the final % DCS bases is around 1% witch is the dosage percentage, 10ng in 1ug)
-	minimap2 -cx map-ont /fasta/DCS.fasta ${file}.fasta_1kb_withDCS.fa > ${file}.fasta_1kb_withDCS_minimapDCS.paf; #path to the DCS fasta file can be modified
+	minimap2 -cx map-ont ./fasta/DCS.fasta ${file}.fasta_1kb_withDCS.fa > ${file}.fasta_1kb_withDCS_minimapDCS.paf; #path to the DCS fasta file can be modified
 	awk '{print 100*($10/$11)}'  ${file}.fasta_1kb_withDCS_minimapDCS.paf|paste ${file}.fasta_1kb_withDCS_minimapDCS.paf - >${file}.fasta_1kb_withDCS_minimapDCS_similarity.paf;
 	awk '{print 100*(sqrt(($9-$8)*($9-$8))/$7)}'  ${file}.fasta_1kb_withDCS_minimapDCS.paf|paste ${file}.fasta_1kb_withDCS_minimapDCS_similarity.paf - > ${file}.fasta_1kb_withDCS_minimapDCS_similarity_subLpar.paf;
 	grep -w "tp:A:P" ${file}.fasta_1kb_withDCS_minimapDCS_similarity_subLpar.paf|awk -F"\t" '$(NF)>=90 && $(NF-1)>=85 && $2<=3600 {print}' |cut -f 1|sort|uniq > ${file}.fasta_1kb_withDCS_minimapDCS_DCSseqID;
-	scripts/filter_fasta_by_list_of_headers.py  ${file}.fasta_1kb_withDCS.fa ${file}.fasta_1kb_withDCS_minimapDCS_DCSseqID > ${file}.fasta_1kb.fa #path to the python script can be modified
+	./scripts/filter_fasta_by_list_of_headers.py  ${file}.fasta_1kb_withDCS.fa ${file}.fasta_1kb_withDCS_minimapDCS_DCSseqID > ${file}.fasta_1kb.fa #path to the python script can be modified
 	
 	#taxonomy classification by kraken2 using GTDB supplemented with mClover genome
 	kraken2 --db database/kraken2_gtdb_r95_20200803_mcloveradded/ ${file}.fasta_1kb.fa  --threads 15 --output ${file}.fasta_1kb_kraken2_gtdb_r95_new --use-names --report ${file}.fasta_1kb_kraken2_report_gtdbr95_new --unclassified-out ${file}.fasta_1kb_kraken2_gtdb_r95_new_unclassified --classified-out ${file}.fasta_1kb_kraken2_gtdb_r95_new_classified; #kraken database path can be replaced here
@@ -113,7 +113,7 @@ do grep "s__" ${file} |sort -k 12n|awk -F"\t" '{print $12}'|sort|uniq > ${file}_
 	grep "d__" ${file} |sort -k 6n|awk -F"\t" '{print $6}'|sort|uniq > ${file}_uniqdomain;
 	cat ${file}_uniq* > ${file}_alltaxa;
 	cat ${file}_alltaxa|while read line; do grep -w "${line}" ${file} |awk -F"\t" '{SUM+=$3} END {print SUM}'; done | paste ${file}_alltaxa - |sort -k1 -t$'\t' >${file}_alltaxa_sumofbases;
-	sed 's/\-/_/g' GTDB_r95_AGS_DB|sort -t$'\t' -k2 >GTDB;#path to the SAGS database can be modified
+	sed 's/\-/_/g' GTDB_r95_AGS_DB|sort -t$'\t' -k2 >GTDB;
 	awk -F"\t" '{print $1}' ${file}_alltaxa_sumofbases |while read line; do grep -w "${line}" GTDB |head -1;done|paste ${file}_alltaxa_sumofbases - > ${file}_alltaxa_sumofbases_AGS_lineage1;# path to the structured GTDB AGS can be modified
 	awk -F"\t" '{print $0, ($1==$4?_:"NOT") "MATCHED"}' ${file}_alltaxa_sumofbases_AGS_lineage1 |awk '{print $NF}'|sort|uniq; # this is to check if all the taxa have been correctly grep (presence of - symbol in grep may cause trouble, better to if all the grep results are correct)
 	awk -F"\t" '{print $1"\t"$3"\t"$5"\t"$2"\t"$2/$5"\t"$NF}' ${file}_alltaxa_sumofbases_AGS_lineage1 > ${file}_alltaxa_AGS_sumofbases_cellnumber_lineage;
@@ -124,7 +124,7 @@ done
 #Minimap2 to find mClover3 genes, identity 75% and min aligned bases to subject 150bps
 ###################################################################################
 for file in *.fasta_1kb.fa
-do minimap2 -cx map-ont /fasta/mClover3.fa  ${file} > ${file}_minimap_mClover3_algn.paf; #path to the mClover3 fasta file can be replaced here
+do minimap2 -cx map-ont ./fasta/mClover3.fa  ${file} > ${file}_minimap_mClover3_algn.paf; #path to the mClover3 fasta file can be replaced here
         awk '{print 100*($10/$11)}'  ${file}_minimap_mClover3_algn.paf |paste ${file}_minimap_mClover3_algn.paf - >${file}_minimap_mClover3_algn.paf_similarity;
         awk '{print sqrt(($9-$8)*($9-$8))}' ${file}_minimap_mClover3_algn.paf_similarity |paste ${file}_minimap_mClover3_algn.paf_similarity - >${file}_minimap_mClover3_algn.paf_similarity_subLcounts;
         grep -w "tp:A:P" ${file}_minimap_mClover3_algn.paf_similarity_subLcounts|awk -F"\t" '$(NF-1)>=75 && $NF>=150 {print}' >${file}_minimap_mClover3_algn.paf_similarity_subLcounts_primary_S75subL150;
@@ -204,7 +204,7 @@ done
 ##################################################################################################################
 for file in *.fastq.fasta_1kb_kraken2_gtdb_r95_new_classified.seqid_length_taxid_uniqtaxids_sumofbases_AGS_lineage_cellnumeber_table2_full_alltaxa_AGS_sumofbases_cellnumber_lineage
 do sed 's/\-/_/g' ${file}_actualcellnumberperLsample > ${file}_actualcellnumberperLsample_mod;
-        sed 's/\-/_/g' /files/foresight_gtdb_1307 > GTDB_foresight_pathogens; #path to the pathogen list can be modified
+        sed 's/\-/_/g' ./files/foresight_gtdb_1307 > GTDB_foresight_pathogens; #path to the pathogen list can be modified
         grep -Fwf GTDB_foresight_pathogens ${file}_actualcellnumberperLsample_mod |sort -t$'\t' -k2> ${file}_actualcellnumberperLsample_mod_pathogens; #path to the pathogen list can be modified
         join -t$'\t' -1 2 -2 1 -o 1.2 1.1 1.3 1.4 1.5 1.6 2.2 2.3 2.4 2.5 2.7 ${file}_actualcellnumberperLsample_mod_pathogens ARG-carrying_taxID_ARGnums_ARGIDs_ARGTypes_ARGsubtypes_taxon_lineage > ARG-carrying_taxID_ARGnums_ARGIDs_ARGTypes_ARGsubtypes_taxon_lineage_pathogens
 done
