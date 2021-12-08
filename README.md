@@ -4,7 +4,7 @@ This repo contains the commands to reproduce the absolute quantification results
 * Raw sequencing data files are available under [BioProject: PRJNA728386](https://dataview.ncbi.nlm.nih.gov/object/PRJNA728386)
 * Intended use for research only
 ***
-## Table of Contents
+## Components for reproducible analysis
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
@@ -15,9 +15,7 @@ This repo contains the commands to reproduce the absolute quantification results
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-
-## Components for reproducible analysis
-#### 1. Construction of the `Structured Average Genome Size (SAGS)` Database 
+## 1. Construction of the `Structured Average Genome Size (SAGS)` Database 
 ***Note:*** <br>
 ***Different versions of the GTDB database can be used following the same logic below.*** <br>
 ***Pay attention to the absolute location of the files used under your local device. Modifications to the absolute file paths may apply.***
@@ -81,9 +79,9 @@ awk -F"\t" '{print $2"\t"$1}' taxid_taxarank_mod.txt >temp1; python merge_metaph
 python merge_metaphlan_tables.py metadata_taxid_taxarank_avggsize.txt taxid_taxrank_lineage|awk -F"\t" '$1="tax_"$1 {print $1"\t"$2"\t"$3"\t"$5}'|sed '1d' |sed '1i tax_1\tRoot\t2995590\tRoot' > GTDB_r95_AGS_DB
 ```
 
-#### 2. End-to-End `Absolute Quantification` workflow
+## 2. End-to-End `Absolute Quantification` workflow
 
-**A) Tools used:** <br>
+#### **A) Tools used:** <br>
   * [seqtk](https://github.com/lh3/seqtk) <br>
   * [seqkit](https://github.com/shenwei356/seqkit) <br>
   * [Kraken2](https://github.com/DerrickWood/kraken2) <br>
@@ -91,7 +89,7 @@ python merge_metaphlan_tables.py metadata_taxid_taxarank_avggsize.txt taxid_taxr
   * [Minimap2](https://github.com/lh3/minimap2) <br>
   * [filter_fasta_by_list_of_headers.py](https://bioinformatics.stackexchange.com/a/3940) <br>
 
-**B) Additional files besides original sequence files required:** (*files bracketed by * should be provided by users*): <br>
+#### **B) Additional files besides original sequence files required:** (*files bracketed by * should be provided by users*): <br>
   * **Kraken2_gtdb_db**: `*your Kraken2-compatible GTDB index database files*` <br>
   * ***mClover3* fasta file**: `/fasta/mClover3.fa` <br>
   * [**nucleotide ARG database and the structure file**](https://github.com/xiaole99/ARGs-OAP-v2.0-development): `*nucleotide-ARG-DB.fasta*` & `*ARG_structure*` <br>
@@ -99,10 +97,10 @@ python merge_metaphlan_tables.py metadata_taxid_taxarank_avggsize.txt taxid_taxr
   * **Nanopore DNA CS fasta file**:  `/fasta/DCS.fasta` <br>
   * **Pathogen list** converted to GTDB taxonomy nomenclature: `/files/foresight_gtdb_1307`, (for [original list](https://webarchive.nationalarchives.gov.uk/ukgwa/20121212135622/http://www.bis.gov.uk/assets/bispartners/foresight/docs/infectious-diseases/t16.pdf))   *Please refer to the manuscript for details of the conversion to GTDB taxonomy nomenclature* <br>
 
-**C) Logic flow and key codes for reproducibility:**
+#### **C) Logic flow and key codes for reproducibility:**
 * Prepare sequencing reads
   * merge, convert file types, filter out reads shorter than 1kb by [seqtk](https://github.com/lh3/seqtk) and [seqkit](https://github.com/shenwei356/seqkit); <br>
-  * identify ([Minimap2](https://github.com/lh3/minimap2)) and remove DCS reads (min 85% similarity, min 90% subLcounts, and max 3600bp length) if DCS is used in ONT library preparation
+  * identify ([Minimap2](https://github.com/lh3/minimap2)) and remove DCS reads if DCS is used in ONT library preparation
 ```
 minimap2 -cx map-ont ./fasta/DCS.fasta input.fasta > output_DCS_minimap.paf
 ```
@@ -115,7 +113,7 @@ kraken2 --db Kraken2_gtdb_db input_1kb.fa  --output kraken2_gtdb_r95 --use-names
 ```
   
 * Spiked marker gene alignment by minimap2 
-  * Identify and filter *mClover3* reads by [Minimap2 with min 75% similarity and min 150 bp aligned bases](https://github.com/lh3/minimap2); <br>
+  * Identify *mClover3* reads by [Minimap2](https://github.com/lh3/minimap2) and filter results with parameters described in our [paper](https://www.sciencedirect.com/science/article/pii/S0048969721072661); <br>
   * calculate *mClover3* gene copy number for a final number of spike cell genome copy number approximation; <br>
   * compile a table with the following info: <br>
   **readID|# of bases aligned to *mClover3*|taxID (`table2`)**
@@ -123,29 +121,26 @@ kraken2 --db Kraken2_gtdb_db input_1kb.fa  --output kraken2_gtdb_r95 --use-names
 minimap2 -cx map-ont ./fasta/mClover3.fa input_1kb.fa > minimap_mClover3_algn.paf
 ```
 * ARG identification by Minimap2 against nucleotide ARG database  <br>
-  * align reads to nucleotide ARG database by [Minimap2](https://github.com/lh3/minimap2) and filter results ([min alignment length 200bp, min identity 80%](https://www.nature.com/articles/s41564-019-0626-z))
+  * align reads to nucleotide ARG database by [Minimap2](https://github.com/lh3/minimap2) and filter results with cutoffs from ([here](https://www.nature.com/articles/s41564-019-0626-z))
   * calculate the gene copy number of different ARGs
   * keep those ARG-carrying reads with at least addtional 1kb walkout distance for ARG host tracking <br>
 ```
 minimap2  -cx map-ont nucleotide-ARG-DB.fasta input_1kb.fa > minimap2_ARG_algn.paf
 ```
 * Calculation of the absolute abundance of microbial cells in unit sample volumn <br>
-*The logic below also applies to the calculation of the absolute abundance of ARGs*
+***The logic below also applies to the calculation of the absolute abundance of ARGs***
 ```
 With inputs of the following positional parameters:
 $1 = int, concentration of spike culture, eg. "3490000" in CFU/uL
 $2 = int, volumn of the spike culture dosed, eg. "100" in uL
 $3 = int, volumn of the sample to which the spike culture is added, eg. "50" in mL
 
-for file in *.fastq.fasta
-do num_of_mClover3_seqd=$(awk -F"\t" '{sum+=$2} END {print sum/720}' table2);
-        scaling_factor=$(awk -v mClover3=$num_of_mClover3_seqd -v conc=${1} -v vol=${2}  'BEGIN {print conc*vol/mClover3}' );
-	awk -F"\t" -v factor=$scaling_factor -v s_vol=${3} '{print (($5*factor)/s_vol)}' table1 |paste table1 - |awk -F"\t" '{print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"($7*1000)"\t"$6}' >table1_actualcellnumberperLsample;
-        echo "Total number of mClover3 is $num_of_mClover3_seqd";
-        echo "Scaling factor is $scaling_factor"
-done
+num_of_mClover3_seqd=$(awk -F"\t" '{sum+=$2} END {print sum/720}' table2);
+scaling_factor=$(awk -v mClover3=$num_of_mClover3_seqd -v conc=${1} -v vol=${2}  'BEGIN {print conc*vol/mClover3}' );
+awk -F"\t" -v factor=$scaling_factor -v s_vol=${3} '{print (($5*factor)/s_vol)}' table1 |paste table1 - |awk -F"\t" '{print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"($7*1000)"\t"$6}' >table1_actualcellnumberperLsample
 ```
-*Absolute abundance of pathogens and ARG-carrying hosts can then be extracted from the **table1_actualcellnumberperLsample** generated above*
+  ***Note:*** <br>
+  ***Absolute abundance of pathogens and ARG-carrying hosts can then be extracted from the **`table1_actualcellnumberperLsample`** generated above***
 
 * **Running time estimation for major steps** <br>
 	For an input fastq file with size `10 Gb`, an approximated `3-4 hr` data processing time would be expected to generate the final microbial absolute quantification results.
