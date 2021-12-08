@@ -120,6 +120,15 @@ python merge_metaphlan_tables.py metadata_taxid_taxarank_avggsize.txt taxid_taxr
 **The following workflow can be realized using the script I have provided: *abs-quanti-nanopore.sh*** <br>
 ***Note: Pay attention to the absolute location of the files used under your local device. Modifications to the absolute file paths are expected for local usage.***
 
+*  Running the script as
+```
+./abs-quanti-nanopore.sh [$1] [$2] [$3]
+
+Parameters:
+	[$1]: concentration of the spike culture, eg. "3490000" in CFU/uL 
+	[$2]: volumn of the spike culture dosed, eg. "50" in uL
+	[$3]: volumn of sample used for spiking, eg. "500" in mL
+```
 * Tools used: <br>
   * [seqtk](https://github.com/lh3/seqtk) <br>
   * [seqkit](https://github.com/shenwei356/seqkit) <br>
