@@ -37,8 +37,8 @@
 # 5. Compile a final mothertable containing the following information for each read: 
 #	taxID|number of reads|sum of bases|AGS|cell number seq'd|ARG annotation|ARG counts|ARG annotation|potential pathogen by pathogen list|kraken2 LCA classification|lineage of the taxonomy classification
 
-# Other tools used:
-# seqtk, seqkit, kraken2, minimap2
+# Running the script as
+# ./abs-quanti-nanopore.sh [concentration of the spike culture] [volumn of the spike culture dosed] [volumn of sample used for spiking]
 
 # Paths needed:
 # Kraken2_gtdb_db: *your Kraken2-compatible GTDB index database files*
