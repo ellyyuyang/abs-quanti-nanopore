@@ -22,62 +22,8 @@ This repo contains the commands to reproduce the absolute quantification results
 * Tools used: <br>
   * [taxonkit](https://github.com/shenwei356/taxonkit) <br>
   * [MetaPhlAn: merge_metaphlan_tables.py](https://github.com/biobakery/MetaPhlAn/tree/master/metaphlan/utils) <br>
-* Download the bacterial and archaeal taxonomy and metadata files from [`GTDB_r95`](https://data.gtdb.ecogenomic.org/releases/release95/):
-```
-# Taxonomy
-wget https://data.ace.uq.edu.au/public/gtdb/data/releases/release95/95.0/bac120_taxonomy_r95.tsv;
-wget https://data.ace.uq.edu.au/public/gtdb/data/releases/release95/95.0/ar122_taxonomy_r95.tsv;
-
-# Metadata
-wget https://data.ace.uq.edu.au/public/gtdb/data/releases/release95/95.0/bac120_metadata_r95.tar.gz; tar -xf bac120_metadata_r95.tar.gz; rm -rf bac120_metadata_r95.tar.gz;
-wget https://data.ace.uq.edu.au/public/gtdb/data/releases/release95/95.0/ar122_metadata_r95.tar.gz; tar -xf ar122_metadata_r95.tar.gz;rm -rf ar122_metadata_r95.tar.gz;
-```
-* Format the downloaded bacterial and archaeal taxonomy and metadata files
-```
-cat bac120_taxonomy_r95.tsv ar122_taxonomy_r95.tsv|sed 's/\-/_/g' > taxonomy.tsv;
-sed '1d' ar122_metadata_r95.tsv >tmp1; sed '1d' bac120_metadata_r95.tsv>tmp2;cat tmp1 tmp2 > metadata.tsv; rm -rf tmp*;
-
-# Select a few useful columns from metadata table and modify the metatable format, obtain NCBI taxid, NCBI species taxid, genome size, GTDB taxonomy
-awk -F"\t" '{print $78"\t"$74"\t"$14"\t"$17}' metadata.tsv|sed 's/;/\t/g'|sed '1i ncbi_taxid\tncbi_species_taxid\tgenome_size\tgtdb_taxonomy_k\tgtdb_taxonomy_p\tgtdb_taxonomy_c\tgtdb_taxonomy_o\tgtdb_taxonomy_f\tgtdb_taxonomy_g\tgtdb_taxonomy_s'|sed 's/\-/_/g'> metadata_taxid_speciestaxid_gsize_taxa.tsv;
-sed '1d' metadata_taxid_speciestaxid_gsize_taxa.tsv>metadata_taxid_speciestaxid_gsize_taxa_mod.tsv;
-```
-* Extract the taxonomy names at different taxonomy levels
-```
-awk -F"\t" '{print$5}' metadata_taxid_speciestaxid_gsize_taxa_mod.tsv|sort|uniq>metadata_taxid_speciestaxid_gsize_taxa_mod_phylum.tsv;
-awk -F"\t" '{print$6}' metadata_taxid_speciestaxid_gsize_taxa_mod.tsv|sort|uniq>metadata_taxid_speciestaxid_gsize_taxa_mod_class.tsv;
-awk -F"\t" '{print$7}' metadata_taxid_speciestaxid_gsize_taxa_mod.tsv|sort|uniq>metadata_taxid_speciestaxid_gsize_taxa_mod_order.tsv;
-awk -F"\t" '{print$8}' metadata_taxid_speciestaxid_gsize_taxa_mod.tsv|sort|uniq>metadata_taxid_speciestaxid_gsize_taxa_mod_family.tsv;
-awk -F"\t" '{print$9}' metadata_taxid_speciestaxid_gsize_taxa_mod.tsv|sort|uniq>metadata_taxid_speciestaxid_gsize_taxa_mod_genus.tsv;
-awk -F"\t" '{print$10}' metadata_taxid_speciestaxid_gsize_taxa_mod.tsv|sort|uniq>metadata_taxid_speciestaxid_gsize_taxa_mod_species.tsv;
-awk -F"\t" '{print$4}' metadata_taxid_speciestaxid_gsize_taxa_mod.tsv|sort|uniq>metadata_taxid_speciestaxid_gsize_taxa_mod_kingdom.tsv;
-```
-* Calculate the average genome sizes at different taxonomy levels
-```
-cat metadata_taxid_speciestaxid_gsize_taxa_mod_phylum.tsv|while read line; do grep -w "${line}" metadata_taxid_speciestaxid_gsize_taxa_mod.tsv|awk -F"\t" '{SUM += $3} END {printf("%.1f\n", SUM/NR)}' ; done | paste metadata_taxid_speciestaxid_gsize_taxa_mod_phylum.tsv  - > metadata_phylum_avggsize.txt;
-cat metadata_taxid_speciestaxid_gsize_taxa_mod_class.tsv|while read line; do grep -w "${line}" metadata_taxid_speciestaxid_gsize_taxa_mod.tsv|awk -F"\t" '{SUM += $3} END {printf("%.1f\n", SUM/NR)}' ; done | paste metadata_taxid_speciestaxid_gsize_taxa_mod_class.tsv  - > metadata_class_avggsize.txt;
-cat metadata_taxid_speciestaxid_gsize_taxa_mod_order.tsv|while read line; do grep -w "${line}" metadata_taxid_speciestaxid_gsize_taxa_mod.tsv|awk -F"\t" '{SUM += $3} END {printf("%.1f\n", SUM/NR)}' ; done | paste metadata_taxid_speciestaxid_gsize_taxa_mod_order.tsv  - > metadata_order_avggsize.txt;
-cat metadata_taxid_speciestaxid_gsize_taxa_mod_family.tsv|while read line; do grep -w "${line}" metadata_taxid_speciestaxid_gsize_taxa_mod.tsv|awk -F"\t" '{SUM += $3} END {printf("%.1f\n", SUM/NR)}' ; done | paste metadata_taxid_speciestaxid_gsize_taxa_mod_family.tsv  - > metadata_family_avggsize.txt;
-cat metadata_taxid_speciestaxid_gsize_taxa_mod_genus.tsv|while read line; do grep -w "${line}" metadata_taxid_speciestaxid_gsize_taxa_mod.tsv|awk -F"\t" '{SUM += $3} END {printf("%.1f\n", SUM/NR)}' ; done | paste metadata_taxid_speciestaxid_gsize_taxa_mod_genus.tsv  - > metadata_genus_avggsize.txt;
-cat metadata_taxid_speciestaxid_gsize_taxa_mod_species.tsv|while read line; do grep -w "${line}" metadata_taxid_speciestaxid_gsize_taxa_mod.tsv|awk -F"\t" '{SUM += $3} END {printf("%.1f\n", SUM/NR)}' ; done | paste metadata_taxid_speciestaxid_gsize_taxa_mod_species.tsv  - > metadata_species_avggsize.txt;
-cat metadata_taxid_speciestaxid_gsize_taxa_mod_kingdom.tsv|while read line; do grep -w "${line}" metadata_taxid_speciestaxid_gsize_taxa_mod.tsv|awk -F"\t" '{SUM += $3} END {printf("%.1f\n", SUM/NR)}' ; done | paste metadata_taxid_speciestaxid_gsize_taxa_mod_kingdom.tsv  - > metadata_kingdom_avggsize.txt;
-cat *_avggsize.txt>GTDB_r95_structured_genome_size.txt;
-```
-* Finalizing the database
-```
-# Combining lineage info from taxid to taxrank file
-awk -F"[\t|\t]+" '{print $(NF-1)"\t"$1}' /kraken2_gtdb_r95_20200803_mcloveradded/taxonomy/nodes.dmp |sed '1d' >taxid_taxarank.txt; 
-sed 's/\-/_/g' taxid_taxarank.txt >taxid_taxarank_mod.txt; 
-awk '{print $NF}' taxid_taxarank.txt >taxid.txt;
-
-# Convert taxid to lineage info and remove the first column  for a file with tab delimiter
-taxonkit lineage --data-dir /kraken2_gtdb_r95_20200803_mcloveradded/taxonomy/ --show-status-code taxid.txt | tee lineage.withcode.txt|cut -d$'\t' -f2- >taxid_lineage.txt;
-
-# Combine taxid and taxarank and genome size info
-python merge_metaphlan_tables.py taxid_taxarank_mod.txt GTDB_r95_structured_genome_size.txt|sed '1d'|awk -F"\t" '{print $2"\t"$1"\t"$3}' >metadata_taxid_taxarank_avggsize.txt;
-awk -F"\t" '{print $2"\t"$1}' taxid_taxarank_mod.txt >temp1; python merge_metaphlan_tables.py temp1 taxid_lineage.txt|sed '1d' |sed 's/\-/_/g'> taxid_taxrank_lineage;rm -rf temp1;
-
-python merge_metaphlan_tables.py metadata_taxid_taxarank_avggsize.txt taxid_taxrank_lineage|awk -F"\t" '$1="tax_"$1 {print $1"\t"$2"\t"$3"\t"$5}'|sed '1d' |sed '1i tax_1\tRoot\t2995590\tRoot' > GTDB_r95_AGS_DB
-```
+* SAGS is built upon the bacterial and archaeal taxonomy and metadata files from [`GTDB_r95`](https://data.gtdb.ecogenomic.org/releases/release95/)
+* Recommended table heading: **`TaxID|TaxName|Average genome size|Lineage`**
 
 ## 2. End-to-End `Absolute Quantification` workflow
 
@@ -91,15 +37,15 @@ python merge_metaphlan_tables.py metadata_taxid_taxarank_avggsize.txt taxid_taxr
 
 #### **B) Additional files besides original sequence files required:** (*files bracketed by * should be provided by users*): <br>
   * **Kraken2_gtdb_db**: `*your Kraken2-compatible GTDB index database files*` <br>
-  * ***mClover3* fasta file**: `/fasta/mClover3.fa` <br>
+  * ***mClover3* fasta file**: `./fasta/mClover3.fa` <br>
   * [**nucleotide ARG database and the structure file**](https://github.com/xiaole99/ARGs-OAP-v2.0-development): `*nucleotide-ARG-DB.fasta*` & `*ARG_structure*` <br>
-  * **Structure Avg Genome Size (AGS) database**: `*GTDB_r95_AGS_DB*` file constructed [above](#2-construction-of-the-structured-average-genome-size-sags-database) <br>
-  * **Nanopore DNA CS fasta file**:  `/fasta/DCS.fasta` <br>
-  * **Pathogen list** converted to GTDB taxonomy nomenclature: `/files/foresight_gtdb_1307`, (for [original list](https://webarchive.nationalarchives.gov.uk/ukgwa/20121212135622/http://www.bis.gov.uk/assets/bispartners/foresight/docs/infectious-diseases/t16.pdf))   *Please refer to the manuscript for details of the conversion to GTDB taxonomy nomenclature* <br>
+  * **Structure Avg Genome Size (AGS) database**: `./files/GTDB_r95_AGS_DB` file constructed above <br>
+  * **Nanopore DNA CS fasta file**:  `./fasta/DCS.fasta` <br>
+  * **Pathogen list** converted to GTDB taxonomy nomenclature: `./files/pathogen.list`, (for [original list](https://webarchive.nationalarchives.gov.uk/ukgwa/20121212135622/http://www.bis.gov.uk/assets/bispartners/foresight/docs/infectious-diseases/t16.pdf))   <br> *Please refer to the manuscript for details of the conversion to GTDB taxonomy nomenclature* <br>
 
-#### **C) Logic flow and key codes for reproducibility:**
+#### **C) Logic flow and key codes:**
 * Prepare sequencing reads
-  * merge, convert file types, filter out reads shorter than 1kb by [seqtk](https://github.com/lh3/seqtk) and [seqkit](https://github.com/shenwei356/seqkit); <br>
+  * merge reads, convert file types, length filtering by [seqtk](https://github.com/lh3/seqtk) and [seqkit](https://github.com/shenwei356/seqkit); <br>
   * identify ([Minimap2](https://github.com/lh3/minimap2)) and remove DCS reads if DCS is used in ONT library preparation
 ```
 minimap2 -cx map-ont ./fasta/DCS.fasta input.fasta > output_DCS_minimap.paf
