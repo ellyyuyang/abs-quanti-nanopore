@@ -72,14 +72,14 @@ minimap2  -cx map-ont nucleotide-ARG-DB.fasta input_1kb.fa > minimap2_ARG_algn.p
   * refer to our [paper](https://www.sciencedirect.com/science/article/pii/S0048969721072661) for the calculation of scaling factor for converting seqenced genome copy number into cell number per unit sample volumn
   * absolute abundance of pathogens and ARG-carrying hosts can then be extracted
  
-* **Running time estimation for major steps** <br>
-	For an input fastq file with size `10 Gb`, an approximated `3-4 hr` data processing time would be expected to generate the final microbial absolute quantification results.
-	* `Kraken2` for taxonomic classification -- `30 min` with 10 threads and 300 G memory pre-allocated.
-	* `Minimap2` for *mClover3* (spiked gene) identification -- `2.5 min` with 10 threads and 150 G memory pre-allocated.
-	* `Processing kraken2 output` to convert the sequenced genome copy numbers to the final absolute cell abundance per unit sample volumn: 
-		* Summing bases for all the classified reads to different Kraken2-assigned LCA taxonomic lineages -- `2.5 hr` with 10 threads and 150 G memory pre-allocated.
-		* Stratifying the summation results above into different taxonomic levels -- `5 min` with 10 threads and 150 G memory pre-allocated.
-		* Convert the sequenced genome copy numbers into the asbolute cell abundance per unit sample volumn -- untimed, but approx. `15 min` with single thread.
+#### **D) Running time estimation for major steps:** 
+For an input fastq file with size `10 Gb`, an approximated `3-4 hr` data processing time would be expected to generate the final microbial absolute quantification results.
+* `Kraken2` for taxonomic classification -- `30 min` with 10 threads and 300 G memory pre-allocated.
+* `Minimap2` for *mClover3* (spiked gene) identification -- `2.5 min` with 10 threads and 150 G memory pre-allocated.
+* `Processing kraken2 output` to convert the sequenced genome copy numbers to the final absolute cell abundance per unit sample volumn: 
+	* Summing bases for all the classified reads to different Kraken2-assigned LCA taxonomic lineages -- `2.5 hr` with 10 threads and 150 G memory pre-allocated.
+	* Stratifying the summation results above into different taxonomic levels -- `5 min` with 10 threads and 150 G memory pre-allocated.
+	* Convert the sequenced genome copy numbers into the asbolute cell abundance per unit sample volumn -- untimed, but approx. `15 min` with single thread.
 		
 
 ## If you intend to use these commands, please cite these resources:
