@@ -3,6 +3,7 @@ This repo contains the commands to reproduce the absolute quantification results
 * This paper is published [here](https://www.sciencedirect.com/science/article/pii/S0048969721072661)
 * Raw sequencing data files are available under [BioProject: PRJNA728386](https://dataview.ncbi.nlm.nih.gov/object/PRJNA728386)
 * Intended use for research only
+
 ***
 ## Components for reproducible analysis
 
@@ -35,10 +36,10 @@ This repo contains the commands to reproduce the absolute quantification results
   * **Kraken2_gtdb_db**: `*your Kraken2-compatible GTDB index database files*` <br>
   * ***mClover3* fasta file**: `./fasta/mClover3.fa` <br>
   * [**nucleotide ARG database and the structure file**](https://github.com/xiaole99/ARGs-OAP-v2.0-development): `*nucleotide-ARG-DB.fasta*` & `*ARG_structure*` <br>
-  * **Structure Avg Genome Size (AGS) database**: `./files/GTDB_r95_AGS_DB` file constructed above <br>
+  * **Structure Avg Genome Size (AGS) database**: `*SAGS*` constructed as [above](#1-construction-of-the-structured-average-genome-size-sags-database) <br>
   * **Nanopore DNA CS fasta file**:  `./fasta/DCS.fasta` <br>
-  * **Pathogen list** converted to GTDB taxonomy nomenclature: `./files/pathogen.list`, (for [original list](https://webarchive.nationalarchives.gov.uk/ukgwa/20121212135622/http://www.bis.gov.uk/assets/bispartners/foresight/docs/infectious-diseases/t16.pdf))   <br> *Please refer to the manuscript for details of the conversion to GTDB taxonomy nomenclature* <br>
-
+  * **Pathogen list**: `*pathogen.list*` [original list](https://webarchive.nationalarchives.gov.uk/ukgwa/20121212135622/http://www.bis.gov.uk/assets/bispartners/foresight/docs/infectious-diseases/t16.pdf)   <br> *Please refer to our manuscript for details of the conversion to GTDB taxonomy nomenclature* <br>
+  * *Original data can be obtained upon request*
 #### **C) Logic flow and key codes:**
 * Prepare sequencing reads
   * merge reads, convert file types, length filtering by [seqtk](https://github.com/lh3/seqtk) and [seqkit](https://github.com/shenwei356/seqkit); <br>
