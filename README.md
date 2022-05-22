@@ -36,7 +36,7 @@ This repo contains the key codes and logic for generating the absolute quantific
   * **Kraken2_gtdb_db**: `*your Kraken2-compatible GTDB index database files*` <br>
   * ***mClover3* fasta file**: `./fasta/mClover3.fa` <br>
   * [**nucleotide ARG database and the structure file**](https://github.com/xiaole99/ARGs-OAP-v2.0-development): `*nucleotide-ARG-DB.fasta*` & `*ARG_structure*` <br>
-  * **Structure Avg Genome Size (AGS) database**: `*SAGS*` constructed as [above](#1-construction-of-the-structured-average-genome-size-sags-database) <br>
+  * **Structured Avg Genome Size (AGS) database**: `*SAGS*` constructed as [above](#1-construction-of-the-structured-average-genome-size-sags-database) <br>
   * **Nanopore DNA CS fasta file**:  `./fasta/DCS.fasta` <br>
   * **Pathogen list**: `*pathogen.list*` [original list](https://webarchive.nationalarchives.gov.uk/ukgwa/20121212135622/http://www.bis.gov.uk/assets/bispartners/foresight/docs/infectious-diseases/t16.pdf)   <br> *Please refer to our manuscript for details of the conversion to GTDB taxonomy nomenclature* <br>
   * *Original data can be obtained upon request*
@@ -74,7 +74,7 @@ minimap2  -cx map-ont nucleotide-ARG-DB.fasta input_1kb.fa > minimap2_ARG_algn.p
   * absolute abundance of pathogens and ARG-carrying hosts can then be extracted
  
 #### **D) Running time estimation for major steps:** 
-For an input fastq file with size `10 Gb`, an approximated `3-4 hr` data processing time would be expected to generate the final microbial absolute quantification results.
+For an input fasta file with size `10 Gb`, an approximated `3-4 hr` data processing time would be expected to generate the final microbial absolute quantification results.
 * `Kraken2` for taxonomic classification -- `30 min` with 10 threads and 300 G memory pre-allocated.
 * `Minimap2` for *mClover3* (spiked gene) identification -- `2.5 min` with 10 threads and 150 G memory pre-allocated.
 * `Processing kraken2 output` to convert the sequenced genome copy numbers to the final absolute cell abundance per unit sample volumn: 
