@@ -19,7 +19,7 @@ This repo contains the key codes and logic for generating the absolute quantific
 ## 1. Construction of the `Structured Average Genome Size (SAGS)` Database 
 * Tools used: <br>
   * [taxonkit](https://github.com/shenwei356/taxonkit) <br>
-  * [MetaPhlAn: merge_metaphlan_tables.py](https://github.com/biobakery/MetaPhlAn/tree/master/metaphlan/utils) <br>
+  * [MetaPhlAn2: merge_metaphlan_tables.py](https://github.com/biobakery/MetaPhlAn2/tree/master/utils) <br>
 * SAGS is built upon the bacterial and archaeal taxonomy and metadata files from [`GTDB_r95`](https://data.gtdb.ecogenomic.org/releases/release95/)
 
 ## 2. End-to-End `Absolute Quantification` workflow
